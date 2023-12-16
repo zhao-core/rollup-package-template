@@ -6,13 +6,16 @@
     "registry": "https://registry.npmjs.org"
   },
   "license": "MIT",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "browser": "dist/browser.js",
+  "main": "dist/index.cjs",
+  "module": "dist/module.mjs",
+  "browser": "dist/browser.min.js",
+  "umd": {
+    "globals": "windows"
+  },
   "debug": "src/index.ts",
   "types": "types/index.d.ts",
   "scripts": {
-    "b:types": "tsc"
+    "build:types": "tsc"
   },
   "files": [
     "dist/**/*",

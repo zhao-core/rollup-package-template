@@ -1,7 +1,11 @@
 import inject from '@rollup/plugin-inject';
 import modify from 'rollup-plugin-modify';
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const module = '@dgret/engine-miniprogram-adapter';
 
@@ -47,7 +51,7 @@ adapterArray.forEach((name) => {
 const packages = fs
   .readdirSync(path.join(__dirname, 'packages'))
   .map((dir) => path.join('packages', dir, `package.json`))
-  .map((pkgPath) => require(path.join(__dirname, pkgPath)))
+  .map(async (pkgPath) =>  JSON.parse(fs.readFileSync(path.join(__dirname, pkgPath))))
   .map((pkg) => pkg.name)
   .map((name) => `"${name}"`);
 

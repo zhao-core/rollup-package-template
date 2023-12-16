@@ -1,28 +1,37 @@
-const fs = require('fs');
-const path = require('path');
-
+import fs from 'fs';
+import path from 'path';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import glslify from 'rollup-plugin-glslify';
 import serve from 'rollup-plugin-serve';
-import miniProgramPlugin from './rollup.miniprogram.plugin';
+import miniProgramPlugin from './rollup.miniprogram.plugin.mjs';
 import replace from '@rollup/plugin-replace';
 import { swc, defineRollupSwcOption, minify } from 'rollup-plugin-swc3';
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const { BUILD_TYPE, NODE_ENV } = process.env;
 
 const pkgsRoot = path.join(__dirname, 'packages');
-const pkgs = fs
-  .readdirSync(pkgsRoot)
-  .filter((dir) => dir !== 'design')
-  .map((dir) => path.join(pkgsRoot, dir))
-  .filter((dir) => fs.statSync(dir).isDirectory())
-  .map((location) => {
-    return {
-      location: location,
-      pkgJson: require(path.resolve(location, 'package.json'))
-    };
-  });
+
+function getPkgs() {
+  const pkgs = fs
+    .readdirSync(pkgsRoot)
+    .filter((dir) => dir !== 'design')
+    .map((dir) => path.join(pkgsRoot, dir))
+    .filter((dir) => fs.statSync(dir).isDirectory())
+    .map((location) => {
+      const pkgJson = fs.readFileSync(path.resolve(location, 'package.json'));
+      return {
+        location: location,
+        pkgJson: JSON.parse(pkgJson)
+      };
+    });
+  return pkgs;
+}
 
 // toGlobalName
 
@@ -84,7 +93,7 @@ function config({ location, pkgJson }) {
         output: [
           {
             file,
-            name: umdConfig.name,
+            name: pkgJson.name,
             format: 'umd',
             sourcemap: false,
             globals: umdConfig.globals
@@ -155,27 +164,27 @@ switch (BUILD_TYPE) {
 }
 
 function getUMD() {
+  const pkgs = getPkgs();
   const configs = pkgs.filter((pkg) => pkg.pkgJson.umd);
-  return configs
-    .map((config) => makeRollupConfig({ ...config, type: 'umd' }))
-    .concat(
-      configs.map((config) =>
+  return configs.map((config) =>
         makeRollupConfig({
           ...config,
           type: 'umd',
-          compress: false,
-          visualizer: false
+          compress: true,
+          visualizer: true
         })
-      )
+     // )
     );
 }
 
 function getModule() {
+  const pkgs = getPkgs();
   const configs = [...pkgs];
   return configs.map((config) => makeRollupConfig({ ...config, type: 'module' }));
 }
 
 function getMini() {
+  const pkgs = getPkgs();
   const configs = [...pkgs];
   return configs.map((config) => makeRollupConfig({ ...config, type: 'mini' }));
 }
