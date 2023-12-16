@@ -3,7 +3,7 @@ import modify from 'rollup-plugin-modify';
 const fs = require('fs');
 const path = require('path');
 
-const module = '@galacean/engine-miniprogram-adapter';
+const module = '@dgret/engine-miniprogram-adapter';
 
 function register(name) {
   return [module, name];

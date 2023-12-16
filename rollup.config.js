@@ -104,7 +104,7 @@ function config({ location, pkgJson }) {
             sourcemap: false
           }
         ],
-        external: external.concat('@galacean/engine-miniprogram-adapter').map((name) => `${name}/dist/miniprogram`),
+        external: external.concat('@dgret/engine-miniprogram-adapter').map((name) => `${name}/dist/miniprogram`),
         plugins
       };
     },
