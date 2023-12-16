@@ -16,7 +16,7 @@ pnpm install
 Then, to build the source, using npm:
 
 ```sh
-npm run b:all
+pnpm run build:all
 ```
 
 ## Links
